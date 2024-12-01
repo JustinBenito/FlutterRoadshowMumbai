@@ -29,6 +29,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   late double widthofPlant;
   late double obstacleSize;
   double dinoBottomPosition = 0;
+  double dinoleftPosition = 0;
   double obstacleXPosition = 0;
 double obstacleYPosition = 0;
 
@@ -42,9 +43,10 @@ double obstacleYPosition = 0;
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
     // Set responsive sizing
-    dinoSize = screenWidth * 0.15;
-    obstacleSize = screenWidth * 0.15;
-    widthofPlant = screenWidth * 0.06;
+    dinoleftPosition = screenWidth * 0.1;
+    dinoSize = screenHeight * 0.20;
+    obstacleSize = screenHeight * 0.15;
+    widthofPlant = screenHeight * 0.06;
   }
 
   void jump() {
@@ -52,6 +54,7 @@ double obstacleYPosition = 0;
       setState(() {
         midJump = true;
         velocityY = jumpVelocity;
+              dinoleftPosition += screenWidth * 0.005;
       });
     }
   }
@@ -60,7 +63,7 @@ double obstacleYPosition = 0;
     setState(() {
       // Gravity and jump physics
       velocityY -= gravity * (0.014); // Adjust for frame rate
-      dinoBottomPosition += velocityY * (screenHeight/600); // Adjust for frame rate
+      dinoBottomPosition += velocityY * (screenHeight/400); // Adjust for frame rate
 
       // Landing check
       if (dinoBottomPosition <= 0) {
@@ -70,7 +73,7 @@ double obstacleYPosition = 0;
       }
 
       // Move obstacle
-      obstacleXPosition -= screenWidth * 0.005;
+      obstacleXPosition -= screenHeight * 0.004;
 
       // Reset obstacle when off-screen
       if (obstacleXPosition+40 < screenWidth * 0.1 ) {
@@ -103,7 +106,7 @@ double obstacleYPosition = 0;
     });
 
     // Game loop
-    gameLoopTimer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
+    gameLoopTimer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
       updatePhysics();
 
       if (detectCollision()) {
@@ -133,122 +136,105 @@ double obstacleYPosition = 0;
   Widget build(BuildContext context) {
     return Scaffold(
       body: GestureDetector(
-        onTap: () {
-          if (gameOver) {
-            playAgain();
-          } else {
-            jump();
-          }
-        },
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Background
-            Container(
-              color: Colors.white,
-            ),
-
-            // Score Display
-            Positioned(
-              top: 50,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Text(
-                  'Score: $score | High Score: $highscore',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-
-            // Dino
-            Positioned(
-              bottom: dinoBottomPosition,
-              left: screenWidth * 0.1,
-              child: Container(
-                width: dinoSize,
-                height: dinoSize,
-                child: Image.asset(
-                  'dino.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-
-            // Obstacle
-            Positioned(
-              bottom: 0,
-              left: obstacleXPosition,
-              child: Container(
-              height: obstacleSize,
-              width: widthofPlant,
-              decoration: BoxDecoration(
-                border: Border.all(
-                color: Colors.black,
-                width: 2.0,
-                ),
-              ),
-              child: Image.asset(
-                'obstacle.png',
-                fit: BoxFit.contain,
-              ),
-              ),
-            ),
-
-// Positioned(
-//               bottom: 0,
-//               left: obstacleXPosition+50,
-//               child: Container(
-//               height: obstacleSize*0.6,
-//               decoration: BoxDecoration(
-//                 border: Border.all(
-//                 color: Colors.black,
-//                 width: 2.0,
-//                 ),
-//               ),
-//               child: Image.asset(
-//                 'obstacle.png',
-//                 fit: BoxFit.contain,
-//               ),
-//               ),
-//             ),
-
-
-            // Game Over Overlay
-            if (gameOver)
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Game Over!',
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: playAgain,
-                      child: const Text('Play Again'),
-                    ),
-                  ],
-                ),
-              ),
-
-            // Start Game Overlay
-            if (!gameHasStarted)
-              Center(
-                child: ElevatedButton(
-                  onPressed: startGame,
-                  child: const Text('Start Game'),
-                ),
-              ),
-          ],
+      onTap: () {
+        if (gameOver) {
+        playAgain();
+        } else {
+        jump();
+        }
+      },
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+        // Background
+        Container(
+          color: const Color.fromARGB(255, 255, 206, 206),
+          child: Image.asset("nowthisisbg.jpeg",fit: BoxFit.cover,),
         ),
+
+        // Positioned(bottom:-410,child: Image.asset('ground.png')),
+        // Score Display
+        Positioned(
+          top: 30, // Moved 20 units higher
+          left: 0,
+          right: 0,
+          child: Center(
+          child: Text(
+            'Score: $score | High Score: $highscore',
+            style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            ),
+          ),
+          ),
+        ),
+
+        // Dino
+        Positioned(
+          bottom: dinoBottomPosition + (screenHeight*0.3), // Moved 20 units higher
+          left: dinoleftPosition,
+          child: Container(
+          width: dinoSize,
+          height: dinoSize,
+          child: Image.asset(
+            'thefin.gif',
+            fit: BoxFit.contain,
+          ),
+          ),
+        ),
+
+        // Obstacle
+        Positioned(
+          bottom: (screenHeight*0.3), // Moved 20 units higher
+          left: obstacleXPosition,
+          child: Container(
+          height: obstacleSize,
+          width: widthofPlant,
+          decoration: BoxDecoration(
+          border: Border.all(
+          color: Colors.black,
+          width: 2.0,
+          ),
+          ),
+          child: Image.asset(
+          'obstacle.png',
+          fit: BoxFit.contain,
+          ),
+          ),
+        ),
+
+        // Game Over Overlay
+        if (gameOver)
+          Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+            const Text(
+              'Game Over!',
+              style: TextStyle(
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: playAgain,
+              child: const Text('Play Again'),
+            ),
+            ],
+          ),
+          ),
+
+        // Start Game Overlay
+        if (!gameHasStarted)
+          Center(
+          child: ElevatedButton(
+            onPressed: startGame,
+            child: const Text('Start Game'),
+          ),
+          ),
+        ],
+      ),
       ),
     );
   }
