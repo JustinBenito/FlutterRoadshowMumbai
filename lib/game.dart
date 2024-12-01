@@ -1,0 +1,255 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+
+class GameScreen extends StatefulWidget {
+  const GameScreen({Key? key}) : super(key: key);
+
+  @override
+  State<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin {
+  // Game state variables
+  bool gameHasStarted = false;
+  bool gameOver = false;
+  bool midJump = false;
+  int score = 0;
+  int highscore = 0;
+
+  // Movement and physics constants
+  static const double gravity = 15.0;
+  static const double jumpVelocity = 10.0;
+  double velocityY = 0.0;
+
+  // Positioning variables
+  
+  late double screenWidth;
+  late double screenHeight;
+  late double dinoSize;
+  late double widthofPlant;
+  late double obstacleSize;
+  double dinoBottomPosition = 0;
+  double obstacleXPosition = 0;
+double obstacleYPosition = 0;
+
+  // Game loop timer
+  Timer? gameLoopTimer;
+  Timer? obstacleTimer;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
+    // Set responsive sizing
+    dinoSize = screenWidth * 0.15;
+    obstacleSize = screenWidth * 0.15;
+    widthofPlant = screenWidth * 0.06;
+  }
+
+  void jump() {
+    if (!midJump && gameHasStarted && !gameOver) {
+      setState(() {
+        midJump = true;
+        velocityY = jumpVelocity;
+      });
+    }
+  }
+
+  void updatePhysics() {
+    setState(() {
+      // Gravity and jump physics
+      velocityY -= gravity * (0.014); // Adjust for frame rate
+      dinoBottomPosition += velocityY * (screenHeight/600); // Adjust for frame rate
+
+      // Landing check
+      if (dinoBottomPosition <= 0) {
+        dinoBottomPosition = 0;
+        midJump = false;
+        velocityY = 0;
+      }
+
+      // Move obstacle
+      obstacleXPosition -= screenWidth * 0.005;
+
+      // Reset obstacle when off-screen
+      if (obstacleXPosition+40 < screenWidth * 0.1 ) {
+        obstacleXPosition = screenWidth;
+        score++;
+      }
+    });
+  }
+
+  bool detectCollision() {
+    // Simple collision detection
+    double dinoXposition=screenWidth * 0.1;
+    print('Collision detected: dinoXposition:$dinoXposition, obstacleXPosition=$obstacleXPosition, dinoBottomPosition=$dinoBottomPosition, obstacleSize=$obstacleSize, dinosize=$dinoSize,velocityY=$velocityY, obstacleYPosition=$obstacleYPosition');
+
+    bool collision = ( dinoXposition<obstacleXPosition+(widthofPlant/2) && obstacleXPosition < screenWidth*0.2 && dinoBottomPosition < obstacleSize);
+    if (collision) {
+      print('Collision detected: dinoXposition:$dinoXposition, obstacleXPosition=$obstacleXPosition, dinoBottomPosition=$dinoBottomPosition, obstacleSize=$obstacleSize, dinosize=$dinoSize, velocityY=$velocityY, obstacleYPosition=$obstacleYPosition');
+    }
+    return collision;
+
+  }
+
+  void startGame() {
+    setState(() {
+      gameHasStarted = true;
+      gameOver = false;
+      score = 0;
+      dinoBottomPosition = 0;
+      obstacleXPosition = screenWidth;
+    });
+
+    // Game loop
+    gameLoopTimer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
+      updatePhysics();
+
+      if (detectCollision()) {
+        gameOver = true;
+        timer.cancel();
+        
+        if (score > highscore) {
+          setState(() {
+            highscore = score;
+          });
+        }
+      }
+    });
+  }
+
+  void playAgain() {
+    startGame();
+  }
+
+  @override
+  void dispose() {
+    gameLoopTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GestureDetector(
+        onTap: () {
+          if (gameOver) {
+            playAgain();
+          } else {
+            jump();
+          }
+        },
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Background
+            Container(
+              color: Colors.white,
+            ),
+
+            // Score Display
+            Positioned(
+              top: 50,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Text(
+                  'Score: $score | High Score: $highscore',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            // Dino
+            Positioned(
+              bottom: dinoBottomPosition,
+              left: screenWidth * 0.1,
+              child: Container(
+                width: dinoSize,
+                height: dinoSize,
+                child: Image.asset(
+                  'dino.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+
+            // Obstacle
+            Positioned(
+              bottom: 0,
+              left: obstacleXPosition,
+              child: Container(
+              height: obstacleSize,
+              width: widthofPlant,
+              decoration: BoxDecoration(
+                border: Border.all(
+                color: Colors.black,
+                width: 2.0,
+                ),
+              ),
+              child: Image.asset(
+                'obstacle.png',
+                fit: BoxFit.contain,
+              ),
+              ),
+            ),
+
+// Positioned(
+//               bottom: 0,
+//               left: obstacleXPosition+50,
+//               child: Container(
+//               height: obstacleSize*0.6,
+//               decoration: BoxDecoration(
+//                 border: Border.all(
+//                 color: Colors.black,
+//                 width: 2.0,
+//                 ),
+//               ),
+//               child: Image.asset(
+//                 'obstacle.png',
+//                 fit: BoxFit.contain,
+//               ),
+//               ),
+//             ),
+
+
+            // Game Over Overlay
+            if (gameOver)
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Game Over!',
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: playAgain,
+                      child: const Text('Play Again'),
+                    ),
+                  ],
+                ),
+              ),
+
+            // Start Game Overlay
+            if (!gameHasStarted)
+              Center(
+                child: ElevatedButton(
+                  onPressed: startGame,
+                  child: const Text('Start Game'),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
