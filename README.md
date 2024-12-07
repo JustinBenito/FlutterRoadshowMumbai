@@ -317,12 +317,12 @@ It is time to write the juicy parts: the logic.
 
 The logical parts in our code that we need to solve are:
 
-1️⃣ Letting the game run:
+1️⃣ Letting the game run:
 
 - Updating the physics of the app continuously
 - Jump on tap
 
-2️⃣ Not letting the game run (end game):
+2️⃣ Not letting the game run (end game):
 
 - Detect if there is a collision between Dash and the obstacle.
 
@@ -467,5 +467,3 @@ You can run it using the command:
 
 ### The Final App:
 <img width="1469" alt="Screenshot 2024-12-07 at 11 04 05 PM" src="https://github.com/user-attachments/assets/1e05ff3e-832c-4a31-9ef5-d8f39ba7fbc4">
-
-
