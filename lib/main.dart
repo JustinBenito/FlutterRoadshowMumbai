@@ -1,5 +1,6 @@
 
 import 'package:dash_run/game.dart';
+// import 'package:dash_run/teachgame.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -7,6 +8,12 @@ void main() {
 }
 
 class DinoRunnerGame extends StatelessWidget {
+
+
+
+
+
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
