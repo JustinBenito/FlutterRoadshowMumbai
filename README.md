@@ -317,12 +317,12 @@ It is time to write the juicy parts: the logic.
 
 The logical parts in our code that we need to solve are:
 
-1️⃣ Letting the game run:
+1️⃣ Letting the game run:
 
 - Updating the physics of the app continuously
 - Jump on tap
 
-2️⃣ Not letting the game run (end game):
+2️⃣ Not letting the game run (end game):
 
 - Detect if there is a collision between Dash and the obstacle.
 
@@ -465,5 +465,7 @@ You can run it using the command:
 
 `flutter run -d chrome`
 
+### The Final App:
+<img width="1469" alt="Screenshot 2024-12-07 at 11 04 05 PM" src="https://github.com/user-attachments/assets/1e05ff3e-832c-4a31-9ef5-d8f39ba7fbc4">
 
-![NammaFlutter Dash Run](https://prod-files-secure.s3.us-west-2.amazonaws.com/a8267991-b303-4582-8325-29e9854dd726/0ad04cd2-3dd2-4a9e-8042-7d1a8197a8a6/Screenshot_2024-12-07_at_10.31.47_PM.png)
+
