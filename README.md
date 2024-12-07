@@ -1,168 +1,3 @@
-# The Article begins here
-
-# Building a Flutter Dino Game: Recreating the Classic Chrome Dinosaur Runner
-
-## Introduction
-
-part of flutter roadshow, abt the idea, y this concept due to time constaint.
-
-## Game Concept ( Inferred from Dino Game )
-
-The game is simple:
-
-- The character (dino) runs in the same place
-- Obstacles appear from the right
-- You tap to make it jump
-- The goal is to avoid obstacles and survive as long as possible
-- Score increases with each obstacle successfully dodged
-    
-    ![Screenshot 2024-12-07 at 10.54.56 AM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/a8267991-b303-4582-8325-29e9854dd726/3e6f89ad-7721-42e6-8af8-d5d252d6b936/Screenshot_2024-12-07_at_10.54.56_AM.png)
-    
-
-We also infer that this is an endless loop where we would have to update the state every second.
-
-So we go with a `StatefulWidget` with several crucial state variable
-
-```dart
-bool gameHasStarted = false;
-bool gameOver = false;
-bool isInJumpState = false;
-int score = 0;
-int highscore = 0;
-
-```
-
-These variables track:
-
-- Game start and end conditions
-- Jump state
-- Player's current and highest scores
-
-### 2. Physics and Movement
-
-The game implements basic physics simulation using gravity and velocity:
-
-```dart
-static const double gravity = 15.0;
-static const double jumpVelocity = 10.0;
-double velocityY = 0.0;
-
-```
-
-### Jump Mechanism
-
-The `jump()` method handles player interactions:
-
-```dart
-void jump() {
-  if (!midJump && gameHasStarted && !gameOver) {
-    setState(() {
-      midJump = true;
-      velocityY = jumpVelocity;
-    });
-  }
-}
-
-```
-
-### 3. Physics Update Method
-
-`updatePhysics()` simulates gravity and movement:
-
-```dart
-void updatePhysics() {
-  setState(() {
-    // Apply gravity
-    velocityY -= gravity * (0.014);
-    dinoBottomPosition += velocityY * (screenHeight/400);
-
-    // Landing check
-    if (dinoBottomPosition <= 0) {
-      dinoBottomPosition = 0;
-      midJump = false;
-      velocityY = 0;
-    }
-
-    // Move obstacle
-    obstacleXPosition -= screenHeight * 0.004;
-  });
-}
-
-```
-
-### 4. Collision Detection
-
-A simple collision detection method checks for obstacle intersection:
-
-```dart
-bool detectCollision() {
-  return (dinoXposition < obstacleXPosition + (widthofPlant/2) &&
-          obstacleXPosition < screenWidth * 0.2 &&
-          dinoBottomPosition < obstacleSize);
-}
-
-```
-
-### 5. Game Loop
-
-The game loop runs on a periodic timer, updating physics and checking for collisions:
-
-```dart
-gameLoopTimer = Timer.periodic(const Duration(milliseconds: 5), (timer) {
-  updatePhysics();
-
-  if (detectCollision()) {
-    gameOver = true;
-    timer.cancel();
-
-    if (score > highscore) {
-      highscore = score;
-    }
-  }
-});
-
-```
-
-### 6. Responsive Design
-
-The game uses screen dimensions to create responsive sizing:
-
-```dart
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  screenWidth = MediaQuery.of(context).size.width;
-  screenHeight = MediaQuery.of(context).size.height;
-
-  // Set responsive sizing
-  dinoleftPosition = screenWidth * 0.1;
-  dinoSize = screenHeight * 0.20;
-  obstacleSize = screenHeight * 0.15;
-}
-
-```
-
-## Challenges and Improvements
-
-While this implementation is fun, there are several ways to enhance the game:
-
-- More complex obstacle generation
-- Multiple obstacle types
-- Power-ups
-- Smoother animations
-- More advanced collision detection
-
-## Conclusion
-
-Building a game like this demonstrates the power of Flutter for creating interactive, responsive mobile applications. By understanding basic game physics, state management, and UI composition, you can create engaging experiences.
-
-## Final Thoughts
-
-Game development is an iterative process. Start simple, test frequently, and gradually add complexity. Happy coding!
-
-### About the Author
-
-A passionate Flutter developer exploring the intersection of creativity and technology.
-
 # My Article
 
 we start with an empty stateful widget coz we know we need to update continously
@@ -588,7 +423,7 @@ Conditions that should get satisfied for collision to happen are
 
 - The position of the obstacle should be near Dash, since Dash is in the 10% of the screen, we can have a condition that checks if the obstacle is first in at least in the vicinity.
 - We should also check the Y axis. So we check if the height of Dash is less than the height of the plant, which means this will continue.
-- The left edge of Dash intersects the middle of obstacle we declare collision.
+- After all this if the edge of Dash intersects the obstacle we declare collision.
 </aside>
 
 ```dart
@@ -598,8 +433,44 @@ Conditions that should get satisfied for collision to happen are
   }
 ```
 
-Hooray! we are now at the end of the build.
+Now that our updatePhysics and detectCollision function is done we can implement this.
 
-Just few more updates to do
+We can continuously check if there has been a collision and if so we would need to end the game, stop the timer and check for the score and update it accordingly. 
 
-Update the start game function to account for the newly initialised variables
+Also we would need to update the new variables. 
+
+```dart
+void startGame() {
+    setState(() {
+      gameHasStarted = true;
+      gameOver = false;
+      score = 0;
+      dinoBottomPosition = 0;
+      obstacleXPosition = screenWidth;
+    });
+
+    // Game loop
+    gameLoopTimer = Timer.periodic(const Duration(milliseconds: 5), (timer) {
+      updatePhysics();
+
+      if (detectCollision()) {
+        gameOver = true;
+        timer.cancel();
+        
+        if (score > highscore) {
+          setState(() {
+            highscore = score;
+          });
+        }
+      }
+    });
+  }
+```
+
+and with that final addition our app is complete. 
+
+You can run it in using the command
+
+`flutter run -d chrome`
+
+![NammaFlutter Dash Run](https://prod-files-secure.s3.us-west-2.amazonaws.com/a8267991-b303-4582-8325-29e9854dd726/0ad04cd2-3dd2-4a9e-8042-7d1a8197a8a6/Screenshot_2024-12-07_at_10.31.47_PM.png)
