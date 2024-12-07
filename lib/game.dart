@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class GameScreen extends StatefulWidget {
@@ -32,6 +33,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   double dinoleftPosition = 0;
   double obstacleXPosition = 0;
 double obstacleYPosition = 0;
+
+double cloud1=Random().nextDouble()/3;
+double cloud2=Random().nextDouble()/3;
+double cloud3=Random().nextDouble()/3;
 
   // Game loop timer
   Timer? gameLoopTimer;
@@ -74,9 +79,14 @@ double obstacleYPosition = 0;
 
       // Move obstacle
       obstacleXPosition -= screenHeight * 0.004;
+      
+      if (obstacleXPosition < screenWidth * 0.1 ) {
+        obstacleXPosition -= screenHeight * 0.04;
+
+      }
 
       // Reset obstacle when off-screen
-      if (obstacleXPosition+40 < screenWidth * 0.1 ) {
+      if (obstacleXPosition < screenWidth * 0.001 ) {
         obstacleXPosition = screenWidth;
         score++;
       }
@@ -106,7 +116,7 @@ double obstacleYPosition = 0;
     });
 
     // Game loop
-    gameLoopTimer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
+    gameLoopTimer = Timer.periodic(const Duration(milliseconds: 5), (timer) {
       updatePhysics();
 
       if (detectCollision()) {
@@ -147,12 +157,21 @@ double obstacleYPosition = 0;
         fit: StackFit.expand,
         children: [
         // Background
-        Container(
-          color: const Color.fromARGB(255, 255, 206, 206),
-          child: Image.asset("nowthisisbg.jpeg",fit: BoxFit.cover,),
+
+
+        Positioned(
+          child: Container(
+            color: const Color.fromARGB(255, 255, 206, 206),
+            child: Image.asset(
+              "optimbg.gif",
+              fit: BoxFit.fitHeight,
+              repeat: ImageRepeat.repeatX,
+            ),
+          ),
         ),
 
-        // Positioned(bottom:-410,child: Image.asset('ground.png')),
+       
+
         // Score Display
         Positioned(
           top: 30, // Moved 20 units higher
@@ -176,8 +195,14 @@ double obstacleYPosition = 0;
           child: Container(
           width: dinoSize,
           height: dinoSize,
+          decoration: BoxDecoration(
+          border: Border.all(
+          color: Colors.black,
+          width: 2.0,
+          ),
+          ),
           child: Image.asset(
-            'thefin.gif',
+            'finwithpav.gif',
             fit: BoxFit.contain,
           ),
           ),
@@ -197,7 +222,7 @@ double obstacleYPosition = 0;
           ),
           ),
           child: Image.asset(
-          'obstacle.png',
+          'reactobstacle.png',
           fit: BoxFit.contain,
           ),
           ),
