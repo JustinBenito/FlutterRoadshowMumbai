@@ -45,7 +45,7 @@ class _GameScreenState extends State<GameScreen>
     dinoleftPosition = screenWidth * 0.1;
     dinoSize = screenHeight * 0.20;
     heightOfObstacle = screenHeight * 0.15;
-    widthOfObstacle = screenHeight * 0.06;
+    widthOfObstacle = screenHeight * 0.16;
   }
 
   void jump() {
@@ -53,7 +53,6 @@ class _GameScreenState extends State<GameScreen>
       setState(() {
         isInJumpState = true;
         velocityY = jumpVelocity;
-        dinoleftPosition += screenWidth * 0.005;
       });
     }
   }
@@ -146,7 +145,7 @@ class _GameScreenState extends State<GameScreen>
               child: Container(
                 color: const Color.fromARGB(255, 255, 206, 206),
                 child: Image.asset(
-                  "optimbg.gif",
+                  "assets/optimbg.gif",
                   fit: BoxFit.fitHeight,
                   repeat: ImageRepeat.repeatX,
                 ),
@@ -178,7 +177,7 @@ class _GameScreenState extends State<GameScreen>
                 width: dinoSize,
                 height: dinoSize,
                 child: Image.asset(
-                  'thefin.gif',
+                  'assets/bday.png',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -191,14 +190,9 @@ class _GameScreenState extends State<GameScreen>
               child: Container(
                 height: heightOfObstacle,
                 width: widthOfObstacle,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 2.0,
-                  ),
-                ),
+                
                 child: Image.asset(
-                  'obstacle.png',
+                  'assets/enemy.png',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -231,8 +225,8 @@ class _GameScreenState extends State<GameScreen>
               Column(
                 children: [
                   Image.asset(
-                    "dashrun.png",
-                    fit: BoxFit.fitHeight,
+                    "assets/eceb.png",
+                    fit: BoxFit.fitWidth,
                   ),
                   Center(
                     child: ElevatedButton(

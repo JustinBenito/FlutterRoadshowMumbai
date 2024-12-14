@@ -10,10 +10,6 @@ void main() {
 class DinoRunnerGame extends StatelessWidget {
 
 
-
-
-
-  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
