@@ -467,3 +467,6 @@ You can run it using the command:
 
 ### The Final App:
 <img width="1469" alt="Screenshot 2024-12-07 at 11 04 05 PM" src="https://github.com/user-attachments/assets/1e05ff3e-832c-4a31-9ef5-d8f39ba7fbc4">
+
+
+![Alt](https://repobeats.axiom.co/api/embed/e4aa14ac2a7de5e12a715477793f02b6acba4c6c.svg "Repobeats analytics image")
