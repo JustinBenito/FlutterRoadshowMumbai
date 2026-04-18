@@ -177,7 +177,7 @@ class _GameScreenState extends State<GameScreen>
                 width: dinoSize,
                 height: dinoSize,
                 child: Image.asset(
-                  'assets/bday.png',
+                  'assets/thefin.gif',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -192,7 +192,7 @@ class _GameScreenState extends State<GameScreen>
                 width: widthOfObstacle,
                 
                 child: Image.asset(
-                  'assets/enemy.png',
+                  'assets/reactobstacle.png',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -225,7 +225,7 @@ class _GameScreenState extends State<GameScreen>
               Column(
                 children: [
                   Image.asset(
-                    "assets/eceb.png",
+                    "assets/dashrun.png",
                     fit: BoxFit.fitWidth,
                   ),
                   Center(
