@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({Key? key}) : super(key: key);
@@ -16,6 +18,13 @@ class _GameScreenState extends State<GameScreen>
   bool isInJumpState = false;
   int score = 0;
   int highScore = 0;
+  String gameOverMessage = '';
+
+  // Random number generator for obstacle sizes
+  final Random random = Random();
+
+  // Focus node for keyboard input
+  final FocusNode _focusNode = FocusNode();
 
   // Movement and physics constants
   final double gravity = 15.0;
@@ -44,8 +53,40 @@ class _GameScreenState extends State<GameScreen>
     // Set responsive sizing
     dinoleftPosition = screenWidth * 0.1;
     dinoSize = screenHeight * 0.20;
-    heightOfObstacle = screenHeight * 0.15;
-    widthOfObstacle = screenHeight * 0.16;
+    randomizeObstacleSize();
+  }
+
+  void randomizeObstacleSize() {
+    // Random size variations like the dino game (small, medium, large)
+    double sizeMultiplier = 0.10 + random.nextDouble() * 0.10; // 0.10 to 0.20
+    heightOfObstacle = screenHeight * sizeMultiplier;
+    widthOfObstacle = screenHeight * (sizeMultiplier + 0.01);
+  }
+
+  String getRandomGameOverMessage() {
+    List<String> messages = [
+      'React won over Flutter!',
+      'You gave up on Flutter!',
+      'Flutter crashed!',
+      'React.js strikes again!',
+      'Dash is disappointed!',
+      'Should have used React!',
+      'Flutter? More like Stutter!',
+      'JavaScript wins this round!',
+    ];
+    return messages[random.nextInt(messages.length)];
+  }
+
+  void handleKeyPress(RawKeyEvent event) {
+    if (event is RawKeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.space) {
+        if (gameOver) {
+          startGame();
+        } else {
+          jump();
+        }
+      }
+    }
   }
 
   void jump() {
@@ -82,6 +123,7 @@ class _GameScreenState extends State<GameScreen>
       if (obstacleXPosition < screenWidth * 0.001) {
         obstacleXPosition = screenWidth;
         score++;
+        randomizeObstacleSize(); // Randomize size for next obstacle
       }
     });
   }
@@ -108,7 +150,10 @@ class _GameScreenState extends State<GameScreen>
       updatePhysics();
 
       if (detectCollision()) {
-        gameOver = true;
+        setState(() {
+          gameOver = true;
+          gameOverMessage = getRandomGameOverMessage();
+        });
         timer.cancel();
 
         if (score > highScore) {
@@ -123,21 +168,26 @@ class _GameScreenState extends State<GameScreen>
   @override
   void dispose() {
     gameLoopTimer?.cancel();
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          if (gameOver) {
-            startGame();
-          } else {
-            jump();
-          }
-        },
-        child: Stack(
+    return RawKeyboardListener(
+      focusNode: _focusNode,
+      autofocus: true,
+      onKey: handleKeyPress,
+      child: Scaffold(
+        body: GestureDetector(
+          onTap: () {
+            if (gameOver) {
+              startGame();
+            } else {
+              jump();
+            }
+          },
+          child: Stack(
           fit: StackFit.expand,
           children: [
             // Background
@@ -204,12 +254,14 @@ class _GameScreenState extends State<GameScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Game Over!',
-                      style: TextStyle(
+                    Text(
+                      gameOverMessage,
+                      style: const TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
+                        color: Colors.red,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
@@ -237,6 +289,7 @@ class _GameScreenState extends State<GameScreen>
                 ],
               ),
           ],
+          ),
         ),
       ),
     );
